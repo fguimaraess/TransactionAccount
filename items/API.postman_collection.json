@@ -1,0 +1,343 @@
+{
+	"info": {
+		"_postman_id": "1913ae4e-900a-4374-ba80-69b919040dff",
+		"name": "BankAccountAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2030830"
+	},
+	"item": [
+		{
+			"name": "Get Account Balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields - customerId, name, accountNumber, and balance\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('customerId');",
+							"    pm.expect(responseData).to.have.property('name');",
+							"    pm.expect(responseData).to.have.property('accountNumber');",
+							"    pm.expect(responseData).to.have.property('balance');",
+							"});",
+							"",
+							"",
+							"pm.test(\"CustomerID is a non-negative integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.customerId).to.be.a('number');",
+							"    pm.expect(responseData.customerId).to.satisfy((customerId) => customerId >= 0, \"CustomerID should be non-negative\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"AccountNumber is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.accountNumber).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AccountNumber should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Balance is a non-negative number\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.balance).to.be.a('number');",
+							"    pm.expect(responseData.balance).to.be.at.least(0);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7159/api/accounts/{{accountId}}/balance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7159",
+					"path": [
+						"api",
+						"accounts",
+						"{{accountId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Account Statement",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate the accountDetail object\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.accountDetail).to.exist.and.to.be.an('object');",
+							"    pm.expect(responseData.accountDetail.accountNumber).to.exist.and.to.be.a('string');",
+							"    pm.expect(responseData.accountDetail.balance).to.exist.and.to.be.a('number');",
+							"    pm.expect(responseData.accountDetail.customerId).to.exist.and.to.be.a('number');",
+							"    pm.expect(responseData.accountDetail.name).to.exist.and.to.be.a('string');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Verify the presence and length of transactionList array\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.transactionList).to.exist.and.to.be.an('array').and.to.have.lengthOf.at.least(1);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Account details should have non-empty strings for accountNumber, balance, customerId, and name\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.accountDetail).to.be.an('object');",
+							"    pm.expect(responseData.accountDetail.accountNumber).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+							"    pm.expect(responseData.accountDetail.balance).to.be.a('number');",
+							"    pm.expect(responseData.accountDetail.customerId).to.be.a('number');",
+							"    pm.expect(responseData.accountDetail.name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate transaction object properties\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData.transactionList).to.be.an('array').that.is.not.empty;",
+							"",
+							"    responseData.transactionList.forEach(function(transaction) {",
+							"        pm.expect(transaction).to.be.an('object');",
+							"        pm.expect(transaction.id).to.be.a('number').and.to.be.above(0);",
+							"        pm.expect(transaction.sourceAccountId).to.be.a('number').and.to.be.above(0);",
+							"        pm.expect(transaction.amount).to.be.a('number').and.to.be.above(0);",
+							"        pm.expect(transaction.description).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+							"        pm.expect(transaction.type).to.be.a('number').and.to.be.within(0, 5);",
+							"        pm.expect(transaction.transactionDate).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Value should not be empty\");",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:7159/api/accounts/{{accountId}}/statement?startDate={{startDate}}&endDate={{endDate}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7159",
+					"path": [
+						"api",
+						"accounts",
+						"{{accountId}}",
+						"statement"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "{{startDate}}"
+						},
+						{
+							"key": "endDate",
+							"value": "{{endDate}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Transaction - Debit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})",
+							"",
+							"pm.test('Response has the required fields', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.isSuccess).to.exist;",
+							"    pm.expect(responseData.message).to.exist;",
+							"})",
+							"",
+							"pm.test('IsSuccess is a boolean value', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.isSuccess).to.be.a('boolean');",
+							"})",
+							"",
+							"pm.test('Message is either an empty string or a non-empty string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.be.a('string');",
+							"})",
+							"",
+							"pm.test('Ensure errorMessage is either null or a string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.errorMessage).to.satisfy(errorMessage => {",
+							"        return errorMessage === null || typeof errorMessage === 'string';",
+							"    }, 'errorMessage should be either null or a string');",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sourceAccountId\": {{accountId}},\n    \"amount\": 1000,\n    \"description\": \"Debit transaction\",\n    \"type\": 1\n}"
+				},
+				"url": {
+					"raw": "http://localhost:7159/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7159",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Transaction - Credit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Response has the required fields', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.isSuccess).to.exist;",
+							"    pm.expect(responseData.message).to.exist;",
+							"})",
+							"",
+							"pm.test('IsSuccess is a boolean value', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.isSuccess).to.be.a('boolean');",
+							"})",
+							"",
+							"pm.test('Content-Type header is application/json', function () {",
+							"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+							"})",
+							"",
+							"pm.test('ErrorMessage is null if isSuccess is true', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.isSuccess).to.equal(true);",
+							"    if (responseData.isSuccess) {",
+							"        pm.expect(responseData.errorMessage).to.be.null;",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sourceAccountId\": {{accountId}},\n    \"amount\": 1000,\n    \"description\": \"Credit transaction\",\n    \"type\": 2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:7159/api/transactions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7159",
+					"path": [
+						"api",
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "accountId",
+			"value": "1"
+		},
+		{
+			"key": "startDate",
+			"value": "2024-08-01"
+		},
+		{
+			"key": "endDate",
+			"value": "2024-08-30"
+		}
+	]
+}
